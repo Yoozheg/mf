@@ -1,0 +1,98 @@
+*{padding:0;margin:0;}
+nav,aside,header,footer,article,section{display:block;}
+body{color:black;background:white;font-family:'Segoe UI','Tahoma',serif;}
+.left{float:left}
+.right{float:right}
+.clear{clear:both}
+
+body>div:first-child{margin:0 auto 0 auto;width:960px;position:relative;}
+h1,h2,h3{font-weight:normal;font-family:'Segoe UI',Verdana,Tahoma,serif;}
+
+header h1,header h2{font-size:1.5em;font-family:'Segoe WPC Light','Segoe UI',Verdana,Tahoma,serif;margin:0;padding:0;}
+header h2{font-size:1.1em;color:silver;margin:0;padding:0;}
+header nav{margin:0.8em 0 2px;font-size:1em;}
+header nav a{text-decoration:none;color:#757575;border:none;display:block;padding-bottom:2px;}
+header nav a:hover{background:#eee;padding-bottom:0;border-bottom:2px solid #69e;}
+header nav li.active{color:#36c;padding-bottom:0;border-bottom:2px solid #36e;}
+header nav ul{list-style:none;}
+header>nav >ul>li{display:inline-block;margin-right:6px;padding:2px 3px 2px;border:none;position:relative;}
+header>nav >ul>li>ul.drop-down-menu{display:none;position:absolute;top:25px;left:3px;background:white;width:150px;background-image:url('img/stripe.png');background-position:left;background-repeat:repeat-y;}
+header>nav >ul>li>ul.drop-down-menu>li{display:block;padding:5px 5px 0 5px;}
+header>nav >ul>li:hover>ul.drop-down-menu{display:block;z-index:12;}
+
+#wrap{clear:both;}
+#wrap aside{float:right;right:0;width:280px;}
+#wrap aside a{text-decoration:none;font-family:'Segoe UI',Verdana,Tahoma,serif;font-weight:normal;color:gray;}
+ 
+ 
+#container{margin-right:290px;}
+
+#feature{height:279px;position:relative; overflow:hidden;margin-bottom:10px;}
+#feature-bottom-buttons{display:none;position:absolute;bottom:0;left:0;right:0;text-align:center;background:rgba(75,75,75,.8);}
+#feature-bottom-buttons button{background:url('img/circle1.png') center center no-repeat;width:29px;height:29px;outline:none;border:none;margin:3px;}
+#feature-bottom-buttons button:hover{background:url('img/circle.png') center center no-repeat;}
+#feature-center-buttons{display:none;position:absolute;top:100px;left:0;right:0;height:79px;text-align:center;background:transparent;}
+#feature:hover #feature-bottom-buttons,#feature:hover #feature-center-buttons{display:none;}/*Чтобы на слайдшоу были кнопки поставить тут display:block;*/
+.feature-button-left{float:left;margin-left:10px;background:url('img/arrow_left.png') center center no-repeat;width:29px;height:29px;outline:none;border:none;}
+.feature-button-right{float:right;margin-right:10px;background:url('img/arrow_right.png') center center no-repeat;width:29px;height:29px;outline:none;border:none;}
+
+#grid{display:block;height:279px;overflow:hidden;margin-bottom:10px;}
+#grid a{display:block;width:122px;height:135px;background-color:#36e;float:left;margin-bottom:4px;color:white;font-family:'Segoe UI',Verdana,Tahoma,serif;font-weight:normal;font-size:1.1em;padding:2px 0 0 15px;text-transform:capitalize;}
+#grid a:nth-child(odd){margin-right:4px;}
+#grid a:hover{background-color:#34e;}
+#grid a{color:whtie;}
+#grid a.ugntu{background:#36e url('img/ugntu.png') bottom right no-repeat;color:white;}
+#grid a.ugntu:hover{background:#34e url('img/ugntu.png') bottom right no-repeat;color:white;}
+#grid a.profkom{background:#36e url('img/profkom.png') bottom right no-repeat;color:white;}
+#grid a.profkom:hover{background:#34e url('img/profkom.png') bottom right no-repeat;color:white;}
+#grid a.raspisanie{background:#36e url('img/ugntu.png') bottom right no-repeat;color:white;}
+#grid a.raspisanie:hover{background:#34e url('img/ugntu.png') bottom right no-repeat;color:white;}
+#grid a.vk{background:#36e url('img/vk.png') bottom right no-repeat;color:white;}
+#grid a.vk:hover{background:#34e url('img/vk.png') bottom right no-repeat;color:white;}
+
+#content section h2,aside section h2{background:#36e url('img/arrow_sidebar.png') bottom right no-repeat;font-size:1.1em;color:white;padding:5px 0 5px 10px;}
+.news-general h2, .news-profburo h2{background-image:none !important}
+#content section{clear:left;}
+#content section article,aside section article{padding:1%;}
+#content section article{width:48%;float:left;}
+#content section article a:hover,aside section article a:hover{/*background-color:#eee;*/ }
+#content section>p{margin-top:10px;text-align:justify;}
+#content section>ol,#content section>ul{padding-left:20px;}
+#content section>ol li,#content section>ul li{margin-top:5px;}
+#content img.left{margin:10px 5px 0 0;}
+#content img.right{margin:10px 0 0 5px;}
+#content section a{text-decoration:none;color:#34e;}
+#content ul.listStyleNone, #content ol.listStyleNone{list-style:none;padding-left:0}
+
+footer{text-align:right;padding-right:10px;clear:both;padding-top:2px;border-top:2px solid #36c;margin-top:5px;}
+footer p{color:#ccc;}
+footer p:hover{color:#888;}
+
+a.news,.right_menu a{display:block;text-decoration:none;color:inherit;margin:2px 0 2px 0;}
+a.news:hover,.right_menu a:hover{background-color:#eee;}
+a.news h3{font-size:1.1em;color:#36c;}
+.right_menu a{font-size:1.1em;}
+
+p.news_posted{font-size:0.9em;color:#aaa;}
+p.news_posted span{color:#69f;}
+
+p.news_short_text{color:black;}
+
+#splash{z-index:10;position:fixed;top:0;right:0;left:0;bottom:0;background-color:rgba(30,30,30,.8);}
+#splash button{position:absolute;top:0;right:0;bottom:0;width:80px;background:rgba(30,30,30,.5);border:none;}
+#splash button:hover{background:rgba(30,30,30,.8);}
+
+#show-news{z-index:11;position:absolute;top:80px;left:79px;right:79px;background-color:white;border:1px solid black;padding:10px;}
+
+#content table{border:1px solid #36e;border-collapse:collapse;margin:10px auto;}
+#content td,#content th{border:1px solid #36e;padding:5px;text-align:center;vertical-align:center;}
+#content tr.alt{background-color:#f5f5f5;}
+#content td.kafedra{background-color:white !important;}
+
+#profili h3{font-weight:bold;font-size:1.1em;text-transform:uppercase;margin-top:10px;text-align:center;}
+#profili h4{font-weight:bold;font-size:1.1em;text-align:center;}
+#profili h5{font-weight:normal;font-size:1.1em;text-align:center;font-style:italic;}
+#profili img{width:250px;}
+#profili h3{clear:both;}
+
+.profiliRightMenu{position:fixed;width:280px;}
