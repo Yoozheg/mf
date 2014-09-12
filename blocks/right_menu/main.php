@@ -1,5 +1,5 @@
 <h2>Полезные ссылки</h2>  <!-- название менюшки-->
-        <article class="right_menu">
+        <article class="rightMenu">
           <a href="#">Банк рефератов</a>
 	      <a href="#">Быстроденьги</a>
 	      <a href="#">Министерство обороны</a>

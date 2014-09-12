@@ -1,5 +1,5 @@
 <h2>Профбюро</h2>  <!-- название менюшки-->
-        <article class="right_menu">
+        <article class="rightMenu">
           <a href="#" class="">Состав профбюро</a>
 		  <a href="#" class="">Памятка профорга группы</a>
 		  <a href="#" class="">Порядок оформления материальной помощи</a>

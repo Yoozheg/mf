@@ -5,6 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
   <script src="xjsl.js"></script>
   <script src="script.js"></script>
   <title>Механический факультет УГНТУ</title>
@@ -19,7 +20,7 @@
   <aside>
     <section>
   	  <h2>Профбюро</h2>  <!-- название менюшки-->
-        <article class="right_menu">
+        <article class="rightMenu">
 		  <a href="profburo.php?link=sostav">Состав профбюро</a>
 		  <a href="profburo.php?link=pamyatka">Памятка профорга группы</a>
 		  <a href="profburo.php?link=matpom">Порядок оформления материальной помощи</a>

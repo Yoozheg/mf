@@ -5,6 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
   <script src="xjsl.js"></script>
   <script src="script.js"></script>
   <title>Механический факультет УГНТУ</title>
@@ -19,10 +20,10 @@
   <aside>
     <section class="profiliRightMenu">
   	  <h2>Профили обучения</h2>  <!-- название менюшки-->
-        <article class="right_menu">
+        <article class="rightMenu">
 		 <a href="#bmp">Профиль БМП</a>
 		 <a href="#bma">Профиль БМА</a>
-		 <a href="#bkz">Профиль БКЗ</a>
+		 <a href="#bmk">Профиль БКЗ</a>
 		 <a href="#bms">Профиль БМС</a>
 		 <a href="#bmz">Профиль БМЗ</a>
 		 <a href="#bmr">Профиль БМР</a>

@@ -19,10 +19,10 @@ function splash(bool){
 
 function showNews(id){
  if(id){
-  splash(true).event.add({click: function(){splash(false); $('#show-news').hide()}});
-  if(!$('#show-news')){   
-   $('body>div:first-child').append(new $('div#show-news')).html('Здесь будет полный текст новости. С картинками, заголовками и т.п.').show();
-  } else{$('div#show-news').html('Здесь будет полный текст новости. С картинками, заголовками и т.п.').show();   
+  splash(true).event.add({click: function(){splash(false); $('#showNews').hide()}});
+  if(!$('#showNews')){   
+   $('body>div:first-child').append(new $('div#showNews')).html('Здесь будет полный текст новости. С картинками, заголовками и т.п.').show();
+  } else{$('div#showNews').html('Здесь будет полный текст новости. С картинками, заголовками и т.п.').show();   
   }
  }
 }
@@ -33,7 +33,7 @@ var feature = {
  set: function(index){
   $('#feature>img').src = feature.list[feature.current = index];
   clearTimeout(feature.timer);
-  feature.timer = setTimeout(function(){$('.feature-button-right').click()},7000);
+  feature.timer = setTimeout(function(){$('.featureButtonRight').click()},7000);
  },
  timer: 0
 };
@@ -42,24 +42,26 @@ function fixItem(el){
  alert($(['.'+el.className]));
 }
 
-xjsl.ready(function(){
+
+
+$.ready(function(){
  for(var i=0; i < feature.list.length; ++i){
-  $('#feature-bottom-buttons').append(new $('button')).html('&nbsp;').val(''+i).event.add({click: function(){
+  $('#featureBottomButtons').append(new $('button')).html('&nbsp;').val(''+i).event.add({click: function(){
    feature.set(this.value);  //формируем нижние кнопки из списка
   }})
  }
  
- $('.feature-button-left').event.add({click: function(){ // обработка клика на левую кнопку
+ $('.featureButtonLeft').event.add({click: function(){ // обработка клика на левую кнопку
   feature.set(feature.current == 0 ? feature.list.length-1 : feature.current-1);
  }})
  
- $('.feature-button-right').event.add({click: function(){ // обработка клика на правую кнопку
+ $('.featureButtonRight').event.add({click: function(){ // обработка клика на правую кнопку
   feature.set(feature.current == feature.list.length-1 ? 0 : feature.current+1);
  }})
  
  feature.set(0);
- 
 
+ 
  
 })
 
