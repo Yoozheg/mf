@@ -1,0 +1,918 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+ <title>XJSL | Документация</title>
+ <link rel="stylesheet" href="docs/style.css" />
+ <script src="/xjsl/xjsl.js"></script>
+ <script type="text/javascript" src="docs/highlight.pack.js"></script>
+</head><body>
+ 
+ <section id="documentation">
+  <article id="xjsl-start">
+	 <h3>Начало работы с фреймворком</h3>
+	 <p>Для начала Вам понадобится сам фреймворк, его вы сможете скачать <a href="xjsl.js" target="blank">тут</a>, затем проинициализировать:</p>
+	 <pre><code class="html">&lt;head&gt;
+ &lt;script src=&quot;xjsl.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;</code></pre>
+	 <p>Вот и всё, теперь вы можете пользоваться всеми возможностями <code>xjsl</code>.</p>
+	 <p>Замечание. Фреймворк написан с использованием режима STRICT в <code>JavaScript</code>, и вам также рекомендуется использовать его при написании кода. Для этого достаточно в начале вашего кода поставить метку <code>&quot;use strict&quot;;</code></p>
+	 <pre><code class="html">&lt;head&gt;
+ &lt;script src=&quot;xjsl.js&quot;&gt;&lt;/script&gt;
+ &lt;script&gt;
+  &quot;use strict&quot;;
+  ... ваш код 
+ &lt;/script&gt;
+&lt;/head&gt;</code></pre>
+	<p>Если вы уже используете функцию <code>$(…)</code> или переменную <code>$</code>, то xjsl заменит её, если она будет создана до подключения фреймворка. В этом случае можно использовать функцию <code>$.conflict()</code> и заключить код, использующий xjsl в функцию-обертку:</p>
+	<pre><code class="javascript">(function($) {
+ // Здесь $(…) — функция фреймворка &quot;xjsl&quot;
+})($.conflict());</code></pre>
+   <p>Примечание. Расширения xjsl не умеют работать с фреймворком, если его основная переменная не <code>$</code>.</p>
+   <p>Функция <code>$.conflict()</code> возвращает объект фреймворка, который вы можете присвоить другому объекту или передать в функцию, как это сделано выше, а также восстанавливает оригинальное значение переменной <code>$</code>, которое было до подключения фреймворка.</p>
+	</article>
+	<article id="xjsl-main">
+	 <h3>Функция $(…) — работа с <abbr title="Document Object Model">DOM</abbr></h3>
+	 <p>Допустим, у нас есть следующий HTML-код:</p>
+	 <pre><code class="html">&lt;div id=&quot;container&quot;&gt;…&lt;/div&gt;</code></pre>
+	 <p>Чтобы получить ссылку на узел <code>&lt;div&gt;</code> с идентификатором <code>container</code>, в JavaScript предусмотрен метод <code>getElementById(…)</code> объекта <code>document</code>:</p>
+	 <pre><code class="javascript">var node = document.getElementById(&quot;container&quot;);</code></pre>
+	 <p>Существует очень распространенная функция, сокращающая эту запись:</p>
+	 <pre><code class="javascript">function $(id){
+ return document.getElementById(id);
+}
+
+//теперь можно писать так:
+var node = $('container')</code></pre>
+	 <p>Или чуть более сложный вариант:</p>
+	 <pre><code class="javascript">function $(arg){
+    return typeof arg === &quot;string&quot; ? document.getElementById(arg) : arg;
+}</code></pre>
+	 <p>В таком виде функция <code>$(…)</code> просто сокращает запись метода <code>getElementById(…)</code>, предавая прямую ссылку на узел, или, в зависимости от типа входных параметров, либо ищет элемент, либо сразу возвращает его (второй вариант).</p>
+	 <p>Поиск элементов можно проводить многими способами, но пожалуй что самый удобный - выбирать элемент так, как это делает CSS. С помощью селекторов.</p>
+	 <pre><code class="javascript">function $(arg){
+    return typeof arg === &quot;string&quot; ? document.querySelector(arg) : arg;
+}</code></pre>
+   <p>Фреймворк xjsl ищет элементы именно таким образом. Однако, он умеет и кое что ещё.</p>
+	</article>
+	<article id="xjsl-main-list">
+	 <h4>Получение элементов страницы</h4>
+	 <p>В xjsl функция <code>$(…)</code> ещё более функциональна, она не только находит элемент или группу элементов по CSS селектору, и для найденных узлов становится доступен набор методов, позволяющих производить манипуляции с <abbr title="Document Object Model">DOM</abbr>, добавлять обработчики событий или изменять стили.</p>
+	 <p>Результат, который вернёт функция <code>$(...)</code>, очень сильно зависит от параметров, которые будут в неё переданы.</p>
+	 <p>Примеры получения элементов с использованием фреймворка:</p>
+	 <pre><code class="javascript">//получить элемент с id=&quot;container&quot;
+var obj = $(&quot;#container&quot;);
+
+//получить первый элемент с class=&quot;myClass&quot;
+var obj = $(&quot;.myClass&quot;);
+
+//получить первый элемент DIV
+var obj = $(&quot;div&quot;);
+
+//получить первый элемент A, находящийся в DIV
+var obj = $(&quot;div a&quot;);
+
+//получить первый элемент A, находящийся в DIV с классом &quot;myClass&quot; в объекте с  id=&quot;container&quot;
+var obj = $(&quot;#container div.myClass a&quot;);</code></pre>
+	 <p>Ну и так далее. В результате переменная <code>obj</code> будет связана с объектом типа <code>HtmlDOMElement</code>. Тем не менее, вы не получите прямого доступа к найденному элементу страницы. Функция <code>$(...)</code> создаёт специальную обёртку, позволяющую заметно упростить работу с DOM</p>
+	 <p>Если объекта не существует, то функция вернёт <code>undefined</code>, что позволяет использовать её в проверках:</p>
+	 <pre><code class="javascript">var element=&quot;#container&quot;
+if($(element)){
+ ... // что-то делаем
+}</code></pre>
+	 <p>Функция <code>$(...)</code> позволяет так же получать и группы элементов - для этого достаточно заключить параметр в квадратные скобки:</p>
+	 <pre><code class="javascript">//получить все элементы с class=&quot;myClass&quot;
+var obj = $([&quot;.myClass&quot;]);
+
+//получить все DIV
+var obj = $([&quot;div&quot;]);
+
+//получить все A, находящиеся в DIV
+var obj = $([&quot;div a&quot;]);</code></pre>
+	 <p>При таком вызове, функция возвращает массив, содержащий найденные элементы, и к этому массиву также есть обёртка из полезного функционала.</p>
+	 <p>так же функция <code>$(...)</code> не зависит от количества переданных параметров, и послушно найдёт все элементы, что вы попросите.</p>
+	 <p>Если отправить в функцию <code>$(…)</code> ссылку на узел либо ранее найденный объект, то она вернёт его в обёртке.</p>
+   <pre><code class="javascript">var p = $(document.getElementsByTagName('p')[0]);
+ // какие-то действия
+p = $(p);</code></pre>
+	 <p>Итак, подведём итоги: Функция <code>$(...)</code> находит один (первый на странице) элемент, удовлетворяющий конкретному запросу, либо находит все элементы по запросу, если параметр функции указан в массиве. При этом, если переданно более одного параметра, и, соответственно, нашлось более одного элемента, то функция вернёт обёртку над группой элементов.</p>
+	 <pre><code class="javascript">var p = $(&quot;#container&quot;,&quot;a.link&quot;,['table>tr>td'])</code></pre>
+	 <p>Далее будут подробно рассмотренны возможности xjsl по работе с найдёнными узлами.</p>
+  </article>	 
+	<article id="xjsl-main-modify">
+	 <h4>Модификация DOM. Работа с узлами страницы. Список методов функции <code>$(...)</code></h4>
+	 <p>Рассмотрим подробнее возможности xjsl по работе с DOM.</p>
+	 <p>Чтобы получить прямую ссылку на <abbr title="Document Object Model">DOM</abbr>-узел, при таком вызове, достаточно написать:</p>
+	 <pre><code class="javascript">var objNode = $(&quot;.container&quot;).get()
+//или
+var objNode = $([&quot;.container&quot;]).get(3); //вернёт четвёртый элемент из набора</code></pre>
+   <p>В этом случае мы получаем прямую ссылку на элемент и лишаемся обёртки от функции <code>$(...)</code>, однако нам доступны стандартные способы манипуляций с узлом.</p>
+	 <p>В случае, если вы работали с группой элементов, а затем захотели продолжить работу лишь с одним из них, существует специальный метод <code>$(...).q(integer index)</code></p>
+	 <pre><code class="javascript">var objNode = $([&quot;.container&quot;]).q(3)</code></pre>
+	 <p>В этом случае objNode получит четвёртый объект из всех возвращённых функцией <code>$(...)</code>, и, при этом, этот объект будет в обёртке, как будто он вернут функцией <code>$(...)</code>.</p>
+	 <p>Так же в любой момент можно беспрепятственно воспользоваться этими методами в уже созданном объекте:</p>
+	 <pre><code class="javascript">var obj = $(&quot;div#container&quot;);
+var objNode = obj.q(0)</code></pre>
+   <p>добавление новых узлов</p>
+	 <pre><code class="javascript">$(document.body).add(&quot;h1&quot;).text(&quot;Пример&quot;);</code></pre>
+  </article> 
+	<article id="xjsl-main-create">
+   <h4>Создание узлов</h4>
+	 <p>Так же функция <code>$(...)</code> умеет создавать элементы. Для этого достаточно вызвать её с помощью инструкции создания объекта <code class="javascript">new</code>:</p>
+	 <pre><code class="javascript">var newLinkElem = new $('a')</code></pre>
+	 <p>Не забываем про CSS селекторы - в можете сразу задать получившемуся объекту class и id:</p>
+	 <pre><code class="javascript">var newLinkElem = new $('a#newlink')
+var newDivElem = new $('div.content#right')</code></pre>
+	 <p>с получившимися элементами сразу можно работать:</p>
+	 <pre><code class="javascript">(new $('div.myClass')).html('текст для примера')</code></pre>
+	</article>
+	<article id="xjsl-main-def">
+   <h4>Ограничения <code>$(...)</code></h4>
+	 <p>Есть несколько ограничений, которых нужно придерживаться используя <code>$(...)</code>:</p>
+   <ul>
+	  <li>Ваш документ должен иметь доктайп <code>HTML 5</code>, чтобы функция <code>$(...)</code> работа правильно. Такой доктайп выставляется следующим образом самой первой строкой вашей HTML страницы.
+	   <pre><code class="html">&lt;!doctype html&gt;</code></pre></li>
+	  <li>В некоторых типах XML документов, например, SVG, некоторые методы функции <code>$(...)</code> могут не работать совсем или частично.</li>
+	  <li>По соображениям безопасности, браузеры не будет возвращать элементы, полученные с использованием CSS-селекторов «:visited» или «:link». Это сделано для того, чтобы веб-мастера не могли определить ссылки на страницы, посещенные пользователем.</li>
+	 </ul>
+	</article>
+	<article id="xjsl-chaining">
+	 <h3>Цепочки — последовательный вызов методов</h3>
+	 <p>В случае, если мы пользуемся стандартными свойствами и методами JavaScript, как например innerHTML или style, хотя нам нужно изменить несколько свойств конкретного элемента, ты мы вынуждены для этого несколько раз получать один и тот же элемент, получая его свойства.</p>
+	 <p>Однако, JavaScript позволяет реализовать последовательный вызов методов, называемый «цепочками вызовов».
+	 В xjsl активно используется эта возможность, что позволяет в некоторых случаях обойтись без дополнительных переменных.
+	 Рассмотрим это на простом примере, добавим DIV элементу с идентификатором <code>container</code> <abbr title="Cascading Style Sheets">CSS</abbr>-стиль <code>background-color:red</code> и какой-то текст:</p>
+	 <pre><code class="javascript">$(&quot;div#container&quot;).css(&quot;background-color:red&quot;).text(&quot;Пример&quot;)
+// или
+$(&quot;div#container&quot;).text(&quot;Пример&quot;).css(&quot;background-color:red&quot;)</code></pre>
+	 <p>В какой последовательности вызывать методы, работающие с одним и тем же узлом, в данном случае, не имеет значения.</p>
+	 <p>В оригинальном HTML+JavaScript это выглядело бы так:
+   <pre><code class="javascript">document.getElementById(&quot;container&quot;).innerText = &quot;Пример&quot;;
+document.getElementById(&quot;container&quot;).style = &quot;background-color:red&quot;;</code></pre></p>
+	 <p>В любом случае в результате получим:</p>
+	 <pre><code class="html">&lt;div id=&quot;container&quot; style=&quot;background-color:red&quot;&gt;Пример&lt;/div&gt;</code></pre>
+	 <p>Цепочку можно продолжать, вызывая доступные методы.</p>
+	 <p>Если все-таки необходимо запомнить ссылку на объект в переменную, то можно сделать это несколькими способами:</p>
+	 <pre><code class="javascript">var obj = $(&quot;div#container&quot;)
+obj.css(&quot;background-color:red&quot;).text(&quot;Пример&quot;)
+// или
+var obj = $(&quot;div#container&quot;).text(&quot;Пример&quot;).css(&quot;background-color:red&quot;)</code></pre>
+	 <p>Второй вариант возможен ввиду того, что методы возвращают объект, созданный на первом звене цепочки вызовов. Но, так происходит не всегда, в фреймворке есть функции, которые могут либо обрывать цепочку, возвращая какое-то значение, либо продолжать цепочку, но работая уже с новым объектом.</p>
+	 <p>Допустим, у нас есть следующий HTML-код:</p>
+	 <pre><code class="html">&lt;div id=&quot;container&quot;&gt;Пример&lt;/div&gt;</code></pre>
+	 <p>Добавим элементу с идентификатором <code>container</code> <abbr title="Cascading Style Sheets">CSS</abbr>-стиль <code>background-color:red</code> и сохраним в переменную содержащийся в нем текст:</p>
+	 <pre><code class="javascript">var text = $(&quot;div#container&quot;).css(&quot;background-color:red&quot;).text()
+alert(text) // выдаст сообщение &quot;Пример&quot;</code></pre>
+	 <p>Метод <code>text()</code>, вызванный без параметров, обрывает цепочку и возвращает <code>innerText</code> текущего узла.</p>
+	 <p>Другой тип функций передает в цепочке новый объект, содержащий, например, ссылку на добавленный элемент:</p>
+	 <pre><code class="javascript">var obj = $(&quot;div#container&quot;).css(&quot;background-color:red&quot;).add(&quot;span&quot;)</code></pre>
+	 <p>В результате в переменной <code>obj</code> будет находиться ссылка на <code>HTMLSpanElement</code>, а не <code>HTMLDivElement</code>, таким образом, можно продолжить цепочку:</p>
+	 <pre><code class="javascript">var obj = $(&quot;div#container&quot;).css(&quot;background-color:red&quot;).add(&quot;span&quot;).text(&quot;Добавленный текст&quot;)</code></pre>
+	 <p>Переменная <code>obj</code> все так же будет содержать ссылку на <code>HTMLSpanElement</code>, так как метод <code>text</code> вернет предыдущий в цепочке объект, созданный функцией <code>append(…)</code>.</p>
+	 <p>HTML-код приобретет следующий вид:</p>
+	 <pre><code class="html">&lt;div id=&quot;container&quot; style=&quot;background-color:red&quot;&gt;
+    Пример
+    &lt;span&gt;Добавленный текст&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+	</article>
+	<article id="xjsl-context">
+	 <h3>Текущий элемент, контекст вызова</h3>
+	 <p>Из предыдущего примера видно, что элемент, с которым идет работа в цепочке вызовов, может изменяться. Соответственно изменяется и контекст вызова функций <code>this</code>, происходит это следующим образом:</p>
+	 <p>Допустим, у нас есть следующий HTML-код:</p>
+	 <pre><code class="html">&lt;div id=&quot;container&quot;&gt;…&lt;/div&gt;</code></pre>
+	 <p>Тогда, выполнив: </p>
+	 <pre><code class="javascript">$(&quot;div#container&quot;)              // this → HTMLDivElement#container
+    .add(&quot;fieldset&quot;)            // this → HTMLFieldsetElement
+        .add(&quot;p&quot;)               // this → HTMLParagraphElement
+            .prep(&quot;span&quot;)       // this → HTMLSpanElement
+                .text(&quot;Пример&quot;) // this → HTMLSpanElement</code></pre>
+	 <p>Получим HTML-код:</p>
+	 <pre><code class="html">&lt;div id=&quot;container&quot;&gt;
+    &lt;fieldset&gt;
+       &lt;p&gt;
+           &lt;span&gt;Пример&lt;/span&gt;
+       &lt;/p&gt;
+    &lt;/fieldset&gt;
+&lt;/div&gt;</code></pre>
+	 <p>это позволяет выполнить какой-то код по отдельности для каждого элемента:</p>
+	 <pre><code class="javascript">$(&quot;container&quot;).each(function() {
+    // this → HTMLDivElement#container
+}).add(&quot;fieldset&quot;).each(function() {
+    // this → HTMLFieldsetElement
+}).add(&quot;p&quot;).each(function() {
+    // this → HTMLParagraphElement
+}).prep(&quot;span&quot;).each(function() {
+    // this → HTMLSpanElement
+}).text(&quot;Пример&quot;) // this → HTMLSpanElement</code></pre>
+	 <p>Метод <code>each(…)</code>запускает callback-функйцию, для всех найденных узлов в текущей цепочке, которая вызывается в контексте текущего узла.</p>
+	</article>
+	<article id="xjsl-events">
+	 <h3>Обработка событий</h3>
+	 <p>Фреймворк xjsl позволяет максимально избавиться от проблем кроссбраузерной обработки событий.
+	 Все функции-обработчики во всех браузерах будут получать в качестве 1-го аргумента объект-событие и будут вызываться в контексте элемента, к событию которого «привязаны».
+	 Кроме того, система обработки событий спроектирована таким образом, чтобы исключить известные причины утечек памяти (Memory Leaks).</p>
+	</article>
+	<article id="xjsl-events-bind">
+	 <h4>Добавление/удаление обработчиков событий</h4>
+	 <p>Добавим обработчик события «click» для узла с идентификатором «container»:</p>
+	 <pre><code class="javascript">$(&quot;#container&quot;).on({&quot;click&quot;: function(eventObject){
+    this // → HTMLDivElement#container
+    eventObject // → объект-событие
+}})</code></pre>
+	 <p>можно "повесить" сразу несколько обработчиков на различные типы событий.</p> 
+	 <pre><code class="javascript">$(&quot;#container&quot;).on({click: function(eventObject){...}, mouseover:function(){...}})</code></pre>
+	 <p>Фреймворк предоставляет удобный механихм удаления обработчиков событий.
+	 Чтобы удалить вообще все обработчики, не обязательно удалять их по одному, достаточно вызвать метод <code>$(...).off()</code> без параметров:</p>
+	 <pre><code class="javascript">$(&quot;#container&quot;).off() // удалить все обработчики событий</code></pre>
+	 <p>Так же легко можно удалить все обработчики конкретного события:</p>
+	 <pre><code class="javascript">$(&quot;#container&quot;).off(&quot;click&quot;) // удалить все обработчики события &quot;click&quot;</code></pre>
+	 <p>Существует возможность удалить конкретный обработчик:</p>
+	 <pre><code class="javascript">function listener() {…}
+$(&quot;div#container&quot;).on({&quot;click&quot;: listener})
+$(&quot;div#container&quot;).off({&quot;click&quot;: listener}) // удалить обработчик &quot;listener&quot; события &quot;click&quot;</code></pre>
+  </article>
+	<article id="xjsl-events-object">
+	 <h4>Работа с объектом-событие</h4>
+	 <p>Для работы с объектом-событие предусмотрен набор методов, позволяющих кроссбраузерно извлечь всю необходимую информацию.</p>
+	</article>
+	<article id="xjsl-events-object-mouse">
+	 <h5>События мыши</h5>
+	 <pre><code class="javascript">$(&quot;#container&quot;).on({mousedown: function(eventObj) {
+ eventObj.which //номер нажатой кнопки мыши (1..3) или клавиши на клавиатуре
+ eventObj.pageX //координата курсора по оси X относительно начала страницы
+ eventObj.pageY //координата курсора по оси Y относительно начала страницы
+}})</code></pre>
+  </article>
+	<article id="xjsl-events-object-default-and-bubbling">
+	<h5>Стандартное действие браузера и всплывание событий</h5>
+	<p>Для предотвращения стандартного действия браузера <code>(preventDefualt/returnValue)</code>, в обработчике события достаточно выполнить <code>return false</code>:</p>
+	<pre><code class="javascript">$(document.forms[0]).on({submit: function(){
+ return false; // выполнить preventDefault для события &quot;submit&quot;
+}})</code></pre>
+	<p>Любое возвращаемое значение, кроме <code>false</code> записыватеся как <code>event.result</code>, что можно использовать для передачи значений дальше по цепочке</p>
+	<p>Если обработчик хочет предотвратить запуск следующих за ним обработчиков события в этом же элементе - он может поставить специальный флаг <code>event.stopNow.</code></p>
+	<pre><code class="javascript">$(document.forms[0]).on({submit: function(eventObj){
+ eventObj.stopNow = true; //больше не сработают обработчики
+}})</code></pre>
+  </article>
+	<article id="xjsl-events-object-target">
+	<h5>Цели события</h5>
+	<pre><code class="javascript">$(document.forms[0]).on({submit:function(eventObj){
+ this // элемент, к которму &quot;привязан&quot; обработчик события (document)
+ eventObj.target //элемент, с которым произошло событие
+ eventObj.relatedTarget //элемент, с которого &quot;пришло&quot; событие
+}})</code></pre>
+	</article>
+	<article id="xjsl-methods">
+	 <h3>Методы xjsl</h3>
+	 <p>Разобьем методы на группы по объектам, к которым они относятся.</p>
+	 <p><a href="#xjsl-methods-DOM">Список методов $.DOM (доступных через прототип функции $(...))</a> | <a href="#xjsl-main-modify">Манипуляции с DOM</a></p>
+	</article>
+	<article id="xjsl-methods-DOM">
+	 <h4>Методы для работы с DOM</h4>
+	 	<table><colgroup><col class="col1" /><col class="col2" /><col class="col3" /><col class="col4" /></colgroup>
+		 <thead><tr><th>Метод</th><th>Варианты вызова</th><th>Возвращаемое значение</th><th>Действие</th></tr></thead>
+		 <tbody>
+			<tr><th colspan="4" class="separate"><abbr title="Document Object Model">DOM</abbr></th></tr>
+			<tr><th rowspan="2">parent</th>
+				<td>.parent()</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Получить родительский узел</td>
+			</tr>
+			<tr>
+				<td>.parent(&quot;tag&quot;) (!)</td>
+				<td>Получить родительский узел с указанным именем тега</td>
+			</tr>
+			<tr><th rowspan="2">append</th>
+				<td>.append(&quot;tag&quot;)</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Добавить новый узел в конец списка дочерних элементов текущего узла</td>
+			</tr>
+			<tr>
+				<td>.append(HTMLElement)</td>
+				<td>Переместить существующий узел в конец списка дочерних элементов текущего узла</td>
+			</tr>
+			<tr><th rowspan="2">prepend</th>
+				<td>.prepend(&quot;tag&quot;)</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Добавить новый узел в начало списка дочерних элементов текущего узла</td>
+			</tr>
+			<tr>
+				<td>.prepend(HTMLElement)</td>
+				<td>Переместить существующий узел в начало списка дочерних элементов текущего узла</td>
+			</tr>
+			<tr><th rowspan="2">after</th>
+				<td>.after(&quot;tag&quot;)</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Добавить новый узел после текущего элемента</td>
+			</tr>
+			<tr>
+				<td>.after(HTMLElement)</td>
+				<td>Поместить существующий узел после текущего элемента</td>
+			</tr>
+			<tr><th rowspan="2">before</th>
+				<td>.before(&quot;tag&quot;)</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Добавить новый узел перед текущим элементом</td>
+			</tr>
+			<tr>
+				<td>.before(HTMLElement)</td>
+				<td>Поместить существующий узел перед текущим элементом</td>
+			</tr>
+			<tr><th rowspan="2">add</th>
+				<td>add(&quot;id&quot;)</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Добавить текущий узел в конец списка дочерних элементов узла с указанным идентификатором</td>
+			</tr>
+			<tr>
+				<td>.add(HTMLElement)</td>
+				<td>Добавить текущий узел в конец списка дочерних элементов указанного узла</td>
+			</tr>
+			<tr><th rowspan="2">pdd</th>
+				<td>pdd(&quot;id&quot;)</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Добавить текущий узел в начало списка дочерних элементов узла с указанным идентификатором</td>
+			</tr>
+			<tr>
+				<td>.pdd(HTMLElement)</td>
+				<td>Добавить текущий узел в начало списка дочерних элементов указанного узла</td>
+			</tr>
+			<tr><th rowspan="2">insert.after</th>
+				<td>.insert.after(&quot;id&quot;)</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Поместить текущий узел после элемета с указанным идентификатором</td>
+			</tr>
+			<tr>
+				<td>.insert.after(HTMLElement)</td>
+				<td>Поместить текущий узел после указанного элемента</td>
+			</tr>
+			<tr><th rowspan="2">insert.before</th>
+				<td>.insert.before(&quot;id&quot;)</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Поместить текущий узел перед элеметом с указанным идентификатором</td>
+			</tr>
+			<tr>
+				<td>.insert.before(HTMLElement)</td>
+				<td>Поместить текущий узел перед указанным элементом</td>
+			</tr>
+			<tr><th rowspan="2">next</th>
+				<td>.next()</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Получить следующий элемент</td>
+			</tr>
+			<tr>
+				<td>.next(&quot;tag&quot;) (!)</td>
+				<td>Получить следующий элемент с указанным именем тега</td>
+			</tr>
+			<tr><th rowspan="2">prev</th>
+				<td>.prev()</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Получить предыдущий элемент</td>
+			</tr>
+			<tr>
+				<td>.prev(&quot;tag&quot;) (!)</td>
+				<td>Получить предыдущий элемент с указанным именем тега</td>
+			</tr>
+			<tr><th rowspan="2">first</th>
+				<td>.first()</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Получить первый дочерний элемент</td>
+			</tr>
+			<tr>
+				<td>.first(&quot;tag&quot;) (!)</td>
+				<td>Получить первый дочерний элемент с указанным именем тега</td>
+			</tr>
+			<tr><th rowspan="2">last</th>
+				<td>.last()</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Получить последний дочерний элемент</td>
+			</tr>
+			<tr>
+				<td>.last(&quot;tag&quot;) (!)</td>
+				<td>Получить последний дочерний элемент с указанным именем тега</td>
+			</tr>
+			<tr><th rowspan="2">q</th>
+				<td>.q(n)</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Получить элемент, стоящий на n+1 позиции в списке дочерних узлов</td>
+			</tr>
+			<tr>
+				<td>.q(n, &quot;tag&quot;) (!)</td>
+				<td>Получить элемент, с указанным именем тега, стоящий на n+1 позиции в списке дочерних узлов</td>
+			</tr><!--
+			<tr>
+				<th rowspan="6">wrap</th>
+				<td>.wrap(&quot;tag&quot;)</td>
+				<td rowspan="6">{HTMLElement}</td>
+				<td rowspan="2">Обернуть текущий узел новым элементом</td>
+			</tr>
+			<tr>
+				<td>.wrap(&quot;tag&quot;, &quot;outside&quot;)</td>
+			</tr>
+			<tr>
+				<td>.wrap(&quot;tag&quot;, &quot;inside&quot;)</td>
+				<td>Обернуть все дочерние узлы текущего элемента новым узлом</td>
+			</tr>
+			<tr>
+				<td>.wrap(HTMLElement)</td>
+				<td rowspan="2">Обернуть текущий узел существующим элементом</td>
+			</tr>
+			<tr>
+				<td>.wrap(HTMLElement, &quot;outside&quot;)</td>
+			</tr>
+			<tr>
+				<td>.wrap(HTMLElement, &quot;inside&quot;)</td>
+				<td>Обернуть все дочерние узлы текущего элемента существующим узлом</td>
+			</tr>-->
+			<tr><th>empty</th>
+				<td>.empty()</td>
+				<td>{HTMLElement}</td>
+				<td>Удалить все дочерние узлы текущего элемента</td>
+			</tr>
+			<tr><th>remove</th>
+				<td>.remove()</td>
+				<td>null</td>
+				<td>Удалить текущий элемент вместе с дочерними узлами</td>
+			</tr>
+			<tr><th rowspan="2">txt</th>
+				<td>.txt()</td>
+				<td>string</td>
+				<td>Получить свойство innerText текущего элемента</td>
+			</tr>
+			<tr>
+				<td>.txt(&quot;string&quot;)</td>
+				<td>{HTMLElement}</td>
+				<td>Удалить все дочерние узлы текущего элемента и поместить в него новый текстовый узел</td>
+			</tr>
+			<tr>
+				<th rowspan="2">html</th>
+				<td>.html()</td>
+				<td>string</td>
+				<td>Получить свойство innerHTML текущего элемента</td>
+			</tr>
+			<tr>
+				<td>.html(&quot;string&quot;)</td>
+				<td>{HTMLElement}</td>
+				<td>Изменить свойство innerHTML текущего элемента</td>
+			</tr>
+			<tr>
+				<th rowspan="2">val</th>
+				<td>.val()</td>
+				<td>string</td>
+				<td>Получить свойство value текущего элемента ввода</td>
+			</tr>
+			<tr>
+				<td>.val(&quot;string&quot;)</td>
+				<td>{HTMLElement}</td>
+				<td>Изменить свойство value текущего элемента ввода</td>
+			</tr>
+			<tr>
+				<th rowspan="5">attr</th>
+				<td>.attr(&quot;attr&quot;)</td>
+				<td rowspan="2">*</td>
+				<td rowspan="2">Получить значение указанного атрибута текущего узла</td>
+			</tr>
+			<tr>
+				<td>.attr([&quot;attr&quot;])</td>
+			</tr>
+			<tr>
+				<td>.attr([&quot;attr1&quot;,&quot;attr2&quot;, …])</td>
+				<td>array</td>
+				<td>Получить массив значений указанных атрибутов текущего узла</td>
+			</tr>
+			<tr>
+				<td>.attr({attr: &quot;value&quot;})</td>
+				<td rowspan="2">{HTMLElement}</td>
+				<td>Изменить значение атрибута текущего узла</td>
+			</tr>
+			<tr>
+				<td>.attr({attr1: &quot;value1&quot;, attr2: &quot;value2&quot;, …})</td>
+				<td>Изменить значения указанных атрибутов текущего узла</td>
+			</tr>
+			<!--<tr>
+				<th rowspan="4">removeAttr</th>
+				<td>.removeAttr(&quot;attr&quot;)</td>
+				<td rowspan="4">{HTMLElement}</td>
+				<td rowspan="4">Удалить значения указанных атрибутов текущего узла</td>
+			</tr>
+			<tr>
+				<td>.removeAttr([&quot;attr&quot;])</td>
+			</tr>
+			<tr>
+				<td>.removeAttr(&quot;attr1 attr2 …&quot;)</td>
+			</tr>
+			<tr>
+				<td>.removeAttr([&quot;attr1&quot;, &quot;attr2&quot;, …])</td>
+			</tr>-->
+			<tr>
+				<th rowspan="2">child</th>
+				<td>.child()</td>
+				<td rowspan="2">{items:ElementsList}</td>
+				<td>Получить все дочерние элементы текущего узла</td>
+			</tr>
+			<tr>
+				<td>.child(&quot;tag&quot;) (!)</td>
+				<td>Получить все дочерние элементы текущего узла c указанными именами тегов</td>
+			</tr>
+			<tr>
+				<th rowspan="12">find</th>
+				<td>.find(&quot;attr&quot;)</td>
+				<td rowspan="12">{items:ElementsList}</td>
+				<td rowspan="12">Получить все дочерние элементы текущего узла, у которых совпадают все указанные атрибуты; поиск элементов ведется на всех уровнях вложенности</td>
+			</tr>
+			<tr>
+				<td>.find([&quot;attr&quot;])</td>
+			</tr>
+			<tr>
+				<td>.find(&quot;attr1 attr2 …&quot;)</td>
+			</tr>
+			<tr>
+				<td>.find([&quot;attr1&quot;, &quot;attr2&quot;])</td>
+			</tr>
+			<tr>
+				<td>.find({attr: &quot;value&quot;})</td>
+			</tr>
+			<tr>
+				<td>.find({attr1: &quot;value1&quot;, attr2: &quot;value2&quot;, …})</td>
+			</tr>
+			<tr>
+				<td>.find(&quot;attr&quot;, &quot;tag&quot;)</td>
+			</tr>
+			<tr>
+				<td>.find([&quot;attr&quot;], &quot;tag&quot;)</td>
+			</tr>
+			<tr>
+				<td>.find(&quot;attr1 attr2 …&quot;, &quot;tag&quot;)</td>
+			</tr>
+			<tr>
+				<td>.find([&quot;attr1&quot;, &quot;attr2&quot;, …], &quot;tag&quot;)</td>
+			</tr>
+			<tr>
+				<td>.find({attr: &quot;value&quot;}, &quot;tag&quot;)</td>
+			</tr>
+			<tr>
+				<td>.find({attr1: &quot;value1&quot;, attr2: &quot;value2&quot;, …}, &quot;tag&quot;)</td>
+			</tr>
+			<tr>
+				<th rowspan="2">each</th>
+				<td>.each(function(HTMLElement, index, ElementsList){…})</td>
+				<td rowspan="2">{items:ElementsList}</td>
+				<td>Последовательно выполнить функцию для каждого элемента списка<!--; чтобы прервать цикл, функция должна вернуть false--></td>
+			</tr>
+			<tr>
+				<td>.each(&quot;method&quot;, arguments)</td>
+				<td>Последовательно выполнить указанный метод для каждого элемента списка</td>
+			</tr><!--
+			<tr>
+				<th rowspan="2">filter (!)</th>
+				<td>.filter(&quot;method&quot;, arguments)</td>
+				<td rowspan="2">{items:ElementsList}</td>
+				<td>Получить новый список элементов из текущего используя метод-фильтр; если метод возвращает true, элемент включается в новую коллекцию</td>
+			</tr>
+			<tr>
+				<td>.filter(NodeList, function(index){…})</td>
+				<td>Получить новый список элементов из текущего используя функцию-фильтр; если функция возвращает true, элемент включается в новую коллекцию</td>
+			</tr>-->
+			<tr>
+				<th colspan="4" class="separate"><abbr title="Cascading Style Sheets">CSS</abbr></th>
+			</tr>
+			<tr>
+				<th rowspan="2">css</th>
+				<td>.css()</td>
+				<td>string</td>
+				<td>Получить значение <abbr title="Cascading Style Sheets">CSS</abbr>-свойства текущего элемента</td>
+			</tr>
+			<tr>
+				<td>.css(&quot;property&quot;)</td>
+				<td>{HTMLElement}</td>
+				<td>Изменить <abbr title="Cascading Style Sheets">CSS</abbr>-свойство текущего элемента</td>
+			</tr>
+			<tr>
+				<th>hide</th>
+				<td>.hide()</td>
+				<td>{HTMLElement}</td>
+				<td>Скрыть текущий элемент</td>
+			</tr>
+			<tr>
+				<th>show</th>
+				<td>.show()</td>
+				<td>{HTMLElement}</td>
+				<td>Сделать текущий элемент видимым</td>
+			</tr>
+			<tr>
+				<th>toggle</th>
+				<td>.toggle()</td>
+				<td>{HTMLElement}</td>
+				<td>Скрыть текущий элемент, если он отображается, иначе — сделать его видимым</td>
+			</tr>
+			<tr>
+				<th colspan="4" class="separate">Events (события)</th>
+			</tr>
+			<tr>
+				<th>event.add</th>
+				<td>.event.add({eventType: func})</td>
+				<td>{HTMLElement}</td>
+				<td>Добавить в обработчик указанного события для текущего элемента функцию func</td>
+			</tr>
+			<tr>
+				<th rowspan="3">event.del</th>
+				<td>.event.del()</td>
+				<td rowspan="3">{HTMLElement}</td>
+				<td>Удалить все обработчики событий текущего элемента</td>
+			</tr>
+			<tr>
+				<td>.event.del(&quot;eventType&quot;)</td>
+				<td>Удалить обработчики события eventType текущего элемента</td>
+			</tr>
+			<tr>
+				<td>.event.del({eventType: func})</td>
+				<td>Удалить обработчик func события eventType текущего элемента</td>
+			</tr>
+		</tbody>
+	</table>
+	</article>
+	<article id="xjsl-ready">
+	 <h4>Функция <code>$.ready(...)</code></h4>
+	 <p>определение</p>
+	 <pre><code class="javascript"> object xjsl $.ready: function(function fn);</code></pre>
+	 <p>если нужно выполнить какой-то JavaScript код сразу после загрузки страницы, часто используют событие <code>window.onload</code>.
+	 Это событие вызывается после того, как документ полностью загрузился в окно браузера.
+	 Что значит, что вызываемый в обработчике этого события код не сработает, пока не загрузятся все изображения, флэш-баннеры и видеоролики на странице.</p>
+	 <p>Однако, 90% кода всё же лучше выполнить до этого момента, когда готова объектная модель документа, и с ним, фактически, уже можно работать.</p>
+	 <p>У разработчика, использущего <code>xjsl</code> есть возможность выполнить свой код в тот момент, когда доступна объектная модель документа, то есть когда браузер уже получил исходный код страницы полностью, но, возможно, еще не подгрузил различное мультимедийное содержимое (рисунки, видео, флэш).</p>
+	 <p>Возможность выполнить такой код предлагается методом <code>$.ready()</code>, который принимает функцию, и выполняет её в момент "готовности" страницы:</p>
+	 <pre><code class="javascript">$.ready(function(){
+ //тут доступны любые операции с DOM
+})</code></pre>
+	</article>
+	<article id="xjsl-methods-ajax">
+	 <h4>Методы работы с <abbr title="Asynchronous JavaScript and XML">AJAX</abbr></h4>
+	 <p><code>Ajax</code> основан на Асинхронном <code>JavaScript</code> и <code>XML</code>. В основе технологии лежит использование нестандартного объекта <code>XMLHttpRequest</code> для взаимодействия со скриптами на стороне сервера.
+	 Объект может, как отправлять, так и получать информацию в различных форматах включая <code>XML</code>, <code>HTML</code> и даже обычный текст.</p>
+	 <p><code>AJAX</code> — это концепция использования нескольких смежных технологий. Основные - 
+	 <ul><li>«асинхронная» природа, использование технологии динамического обращения к серверу «на лету», без перезагрузки всей страницы полностью</li>
+	 <li>использование <code>DHTML</code> для динамического изменения содержания страницы</li></ul></p>
+	 <p>Преимущества <code>ajax</code><ul>
+	 <li>Экономия трафика</li>
+	 <li>Уменьшение нагрузки на сервер</li>
+	 <li>Ускорение реакции интерфейса</li></ul></p>
+	 <p>Из недостатков можно выделить <strong>отсутствие интеграции со стандартными инструментами браузера</strong>
+	 - динамически создаваемые страницы не регистрируются браузером в истории посещения страниц, поэтому не работает кнопка «Назад», предоставляющая пользователям возможность вернуться к просмотренным ранее страницам, но существуют скрипты, которые могут решить эту проблему.
+	 <br>Другой недостаток изменения содержимого страницы при постоянном URL заключается в невозможности сохранения закладки на желаемый материал.
+	 Частично решить эти проблемы можно с помощью динамического изменения идентификатора фрагмента (части URL после #);<br>
+	 <strong>Динамически загружаемое содержимое недоступно поисковикам</strong> - разработчики должны позаботиться об альтернативных способах доступа к содержимому сайта.</p>
+	 <p>При этом технология <code>AJAX</code> стремительно набирает обороты. Рассмотрим её поближе:</p>
+	 <p>Что должна делать функция обработки ajax?<ol>
+	 <li>Получить какие-либо данные</li>
+	 <li>Создать URL для подключения.</li>
+	 <li>Открыть соединение с сервером.</li>
+	 <li>Установить функцию для сервера, которая выполнится после его ответа.</li>
+	 <li>Передать запрос.</li>
+	 </ol>Функция <code>$.ajax(...)</code> выполняет именно эти операции и именно в этом порядке.</p>
+	 <p>прототип:</p>
+	 <pre><code class="javascript">object xjsl ajax: function(string text, string addr, function callback, string method);</code></pre>
+	 <p>входные параметры:
+	  <ul>
+	   <li><strong>text</strong> - строка запроса или специальное значение <code>null</code>.</li>
+	   <li><strong>addr</strong> - строка адреса файла на сервере.</li>
+	   <li><strong>callback</strong> - функция, которая будет выполнена по завершению запроса, точнее, по успешному получению ответа.  Первым параметром получает ответ.</li>
+	   <li><strong>method</strong> - строка, метод. значения - <code>"post"</code> или <code>"get"</code>. Это необязательный параметр, в случае его отсутствия запросу ставится метод <code>POST</code> или <CODE>GET</CODE>, если запрос <code>null</code>.</li>
+	  </ul>
+	 </p>
+	</article>
+	<article id="xjsl-methods-cookie">
+	<h4>Методы работы с <abbr title="Cookies technology">Cookie</abbr></h4>
+	<p>С помощью функции <code>$.cookie(...)</code> фреймворк предлагает удобный интерфейс для работы с <code>cookies</code>.</p>
+	<p>определение</p>
+	<pre><code class="javascript">object xjsl $.cookie: function(string name, string value, object props);</code></pre>
+	<p>Эта функция реализует добавление/изменение, чтение и удаление "печенек".</p>
+	<p>Параметры объекта <code>props</code>:</p>
+	<pre><code class="javascript">object props = {data expires, string path, string domain, bool secure}</code></pre>
+	<p><code>expires</code> Время истечения cookie.<br>
+	Интерпретируется по-разному, в зависимости от типа:<br>
+  	Если число - количество секунд до истечения.<br>
+  	Если объект типа <code>Date</code> - точная дата истечения.<br>
+  	Если expires в прошлом, то <code>cookie</code> будет удалено.<br>
+  	Если expires отсутствует или равно 0, то <code>cookie</code> будет установлено как сессионное и исчезнет при закрытии браузера.</p>
+  <p><code>path</code> Путь для <code>cookie</code>.</p>
+  <p><code>domain</code> Домен для <code>cookie</code>.</p>
+  <p><code>secure</code> Пересылать <code>cookie</code> только по защищенному соединению.</p>
+  <p>если отсутствуют <code>value</code> и <code>props</code> - функция возвращает значение <code>cookie</code> записи <code>name</code>.</p>
+  	<table summary="">
+		<colgroup>
+		<col class="col1" />
+		<col class="col2" />
+		<col class="col3" />
+		<col class="col4" />
+		</colgroup>
+		<thead>
+			<tr>
+				<th>Метод</th>
+				<th>Варианты вызова</th>
+				<th>Возвращаемое значение</th>
+				<th>Действие</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th rowspan="3">$.cookie</th>
+				<td>$.cookie("name","value",props = {...})</td>
+				<td rowspan="2">object xjsl</td>
+				<td>Запись cookie c именем name, значением value и параметрами props</td>
+			</tr>
+			<tr>
+				<td>$.cookie("name",null,{expires: -1})</td>
+				<td>Удалить cookie запись с именем name</td>
+			</tr>
+			<tr>
+				<td>$.cookie("name")</td>
+				<td>string</td>
+				<td>Возвращает значение cookie записи с именем name</td>
+			</tr>
+		</tbody>
+	</table>
+	<p>Поскольку метод возвращает ссылку на объект <code>xjsl</code> - его можно использовать в цепочных вызовах.</p>
+	<p>Примеры работы с cookie</p>
+	<pre><code class="javascript">$.cookie('session-cookie-test','test-test'); //создать сессионную кукие
+alert($.cookie('session-cookie-test')); //прочитать её -> test-test
+$.cookie('session-cookie-test',null,{expires:-1}); //удалить
+
+//следующий код работает
+$.ready(function(){
+ alert($.cookie('test-cookie')); //пытаемся прочитать test-cookie
+}).cookie('test-cookie','cookie-value',{expires:60*60*24}) //установка test-cookie на сутки
+//$.ready(fn) запускает fn после загрузки DOM, но цепочка не прерывается - так что к этому времени cookie уже будет существовать 
+
+//но лучше писать так - на всякий случай
+$.cookie('test-cookie','cookie-value',{expires:60*60*24}) //записываем кукие раньше.
+ .ready(function(){
+  alert($.cookie('test-cookie')); //пытаемся прочитать test-cookie
+ });</code></pre>
+	</article>
+	<article id="xjsl-methods-storage">
+	 <h4>Методы работы с <abbr title="Web (DOM) Storage technology">Storage</abbr> (Хранилищем)</h4>
+   <p>Библиотека xjsl содержит методы, позволяющие удобно работать с внутренним хранилищем браузера, таким как LocalStorage или GlobalStorage.</p>
+	 <p>Storage хранилище позволяет сохранять очень много данных (больше, чем cookie) на компьютере клиента.</p>
+	 <p>Если точнее, браузер клиента создает некую локальную базу данных, куда вы можете записывать ваши данные. При чём гарантируются определённые уровни безопасности.</p>
+	 <p>Казалось бы, в чём отличие cookie от Storage? Дело не только в размере.</p>
+	 <p>В cookie данные хранятся в виде одной строки, содержащей все cookie, и учавствующий всякий раз в обмене даных с сервером. Так же, по истечении определённого времени браузер будет удалять старые cookie записи.</p>
+	 <p>В хранилище же содержатся пары вида { ключ : значение }, при чём ключи уникальны и находятся все записи в некой таблице в базе данных хранилищ для всех сайтов, посещаемых пользователем.</p>
+	 <p>Получить значение можно только зная ключ, а получить ключ, если вы его не знаете, можно по номеру строки в таблице записей.</p>
+	 <p>И повторюсь, xjsl предоставляет удобные api для доступа к этим данным.</p>
+	 <table summary=""><colgroup><col class="col1" /><col class="col2" /><col class="col3" /><col class="col4" /></colgroup>
+	  <thead><tr><th>Метод</th><th>Варианты вызова</th><th>Возвращаемое значение</th><th>Действие</th></tr></thead>
+	  <tbody><tr>
+	   <th rowspan="2">$.storage.set</th>
+	   <td>$.storage.set("item", "value")</td>
+	   <td rowspan="4">object xjsl</td>
+	   <td rowspan="2">в хранилище записывается пара {"item" : "value"} c ключём "item", и значением "value"</td>
+	  </tr><tr><td>! $.storage.set({"item": "value"})</td></tr><tr>
+	  <th>$.storage.del</th>
+	   <td>$.storage.del("item")</td>
+	   <td>Удалить из хранилища запись с ключём "item".</td>
+	  </tr><tr>
+	   <th>$.storage.clear</th>
+	   <td>$.storage.clear()</td>
+	   <td>Удаление из хранилища всех записей</td>
+	  </tr><tr>
+	   <th>$.storage.get</th>
+	   <td>$.storage.get("item")</td>
+	   <td rowspan="2">string</td>
+	   <td>Возвращает из хранилища значение записи с ключём item</td>
+	  </tr><tr>
+	   <th>$.storage.key</th>
+	   <td>$.storage.key(index)</td>
+	   <td>Возвращает из хранилища имя ключа по номеру строки в таблице</td>
+	  </tr><tr>
+	   <th>$.storage.len</th>
+	   <td>$.storage.len("item")</td>
+	   <td>number</td>
+	   <td>Возвращает из хранилища количество записей.</td>
+	  </tr></tbody></table>
+	</article>
+  <article id="xjsl-extensions">
+   <h3>Расширения XJSL</h3>
+   <p>Здесь вы можете получить базовую информацию о стандартных расширениях и плагинах для библиотеки xjsl</p>
+   <p>Расширения XJSL могут как расширять базовый функционал, так и функционал по работе с DOM</p>
+   <p>Список основных расширений:</p>
+   <ul>
+    <li><a href="#xjsl-extensions-canvas">xjsl.canvas</a> - Плагин для работы с HTML 5 Canvas Api</li>
+    <li>xjsl.client</li>
+    <li>xjsl.debug</li>
+    <li>xjsl.frames</li>
+    <li>xjsl.rand</li>
+    <li>xjsl.rusform</li>
+    <li>xjsl.splash</li>
+    <li>xjsl.DOM.hover</li>
+    <li>xjsl.DOM.svg</li>
+   </ul>
+  </article>
+  <article id="xjsl-extensions-canvas">
+   <h3>Расширение XJSL.canvas</h3>
+   <table summary=""><colgroup><col class="col1" /><col class="col2" /><col class="col3" /><col class="col4" /></colgroup>
+	  <thead><tr><th>Метод</th><th>Варианты вызова</th><th>Возвращаемое значение</th><th>Действие</th></tr></thead><tbody>
+    <tr>
+	   <th rowspan="2">$.storage.set</th>
+	   <td>$.storage.set("item", "value")</td>
+	   <td rowspan="4">object xjsl</td>
+	   <td rowspan="2">в хранилище записывается пара {"item" : "value"} c ключём "item", и значением "value"</td>
+	  </tr><tr><td>! $.storage.set({"item": "value"})</td></tr><tr>
+	  <th>$.storage.del</th>
+	   <td>$.storage.del("item")</td>
+	   <td>Удалить из хранилища запись с ключём "item".</td>
+	  </tr><tr>
+	   <th>$.storage.clear</th>
+	   <td>$.storage.clear()</td>
+	   <td>Удаление из хранилища всех записей</td>
+	  </tr><tr>
+	   <th>$.storage.get</th>
+	   <td>$.storage.get("item")</td>
+	   <td rowspan="2">string</td>
+	   <td>Возвращает из хранилища значение записи с ключём item</td>
+	  </tr>
+   </tbody></table>
+  </article>
+	<article id="xjsl-writing-extensions">
+	 <h3>Создание расширений для XJSL</h3>
+	 
+	</article>
+	<article id="xjsl-features">
+	 <h3>Что дальше?</h3>
+	 <p>Дальнейшие планы по наращиванию функционала:</p>
+	<ul>
+		<li>WebSocket</li>
+		<li>History API</li>
+		<li>Notifications API</li>
+	</ul>
+	<p>А так же в ближайшее время:</p>
+	<ul>
+	 <li>$.storage.each()</li>
+	</ul>
+	</article>
+	
+  <table id="summary"><tr><td>
+	 <h1 onclick="window.open('xjsl.js')">xjsl | <header>Документация</header><span>JavaScript framework</span></h1>
+	 <div>
+	  <p>«<dfn title="eXtensible JavaScript Framework">xjsl</dfn>» — это небольшой, но многофункциональный <code><a href="http://javascript.ru/ecma">JavaScript</a></code> framework,
+	  обеспечивающий <strong>кроссбраузерную*</strong> работу с <abbr title="Document Object Model">DOM</abbr>, <abbr title="Cascading Style Sheets">CSS</abbr>, <abbr title="Asynchronous JavaScript and XML">Ajax</abbr>,
+	  <abbr title="хранение небольших часто использемых данных на клиенте">Cookie</abbr> и <abbr title="Web (DOM) Storage">Storage</abbr>.
+	  Фреймворк может использоваться в проектах любой сложности, однако занимает в глобальной области имя переменной <code>$</code>.
+	  <insert>*<dfn title="eXtensible JavaScript Framework">xjsl</dfn> предназначен для работы только с современными браузерами.</insert></p>
+	  <p>Структура xjsl обеспечивает удобный механизм расширения стандартного функционала.</p>
+
+	  <div>Поддерживаемые браузеры:<div><img src="docs/browser_logos-64.png"></div></div>
+	  <ul>
+	   <li><a href="http://windows.microsoft.com/ru-RU/internet-explorer/products/ie/home">Microsoft Windows Internet Explorer</a> <strong>10.0+</strong></li>
+	   <li><a href="http://www.mozilla.org/ru/firefox/new/">Mozilla FireFox</a> <strong>17+</strong></li>
+	   <li><a href="http://www.opera.com/browser/">Opera</a> <strong>11.5+</strong></li>
+	   <li><a href="https://www.google.com/chrome/">Google Chrome</a> <strong>18+</strong></li>
+	   <li><a href="http://www.apple.com/ru/safari/download/">Apple Safari</a> <strong>5+</strong></li>
+	  </ul>
+	  <p>Из документации фреймворка xjsl вы сможете узнать все предоставляемые методы, способы их использования, а так же некоторые принципы работы фреймворка, его стандартных плагинов, а также, получите информацию о создании собственных расширений.</p>
+	  <p><center><a href="#xjsl-start">Перейти к документации</a> | <a href="xjsl.js" target="blank">Скачать <code>xjsl.js</code></a> | <a href="https://github.com/xaozlo/xjsl" target="blank">Репозиторий на GitHub.com</a></center></p>
+	 </div>
+	 <footer>&copy; <a href="http://twitter.com/xaozlo">Ибрагимов Ринат</a>, 2012-2013</footer>
+	</td></tr></table>
+ </section>
+ 
+ <ul id="contents">
+  <li><a href="#xjsl-start">Начало работы с фреймворком</a></li>
+  <li><a href="#xjsl-main">Функция $(…) — работа с <abbr title="Document Object Model">DOM</abbr></a>
+   <ul>
+  	<li><a href="#xjsl-main-list">Получение элементов страницы</a></li>
+ 	  <li><a href="#xjsl-main-modify">Работа с узлами DOM. Изменение элементов страницы</a></li>
+  	<li><a href="#xjsl-main-create">Создание узлов</a></li>
+  	<li><a href="#xjsl-main-def">Ограничения $(...)</a></li>
+   </ul>
+  </li>
+  <li><a href="#xjsl-chaining">Цепочки — последовательный вызов методов</a></li>
+  <li><a href="#xjsl-context">Текущий элемент, контекст вызова</a></li>
+  <li> <a href="#xjsl-events">Обработка событий</a>
+  	<ul>
+  	 <li><a href="#xjsl-events-bind">Добавление/удаление обработчиков событий</a></li>
+  	 <li><a href="#xjsl-events-object">Работа с объектом-событие</a>
+  	 	<ul>
+  	 	 <li><a href="#xjsl-events-object-mouse">События мыши</a></li>
+  	 	 <li><a href="#xjsl-events-object-default-and-bubbling">Стандартное действие браузера и всплывание событий</a></li>
+  	 	 <li><a href="#xjsl-events-object-target">Цели события</a></li>
+  	 	</ul>
+  	 </li>
+  	</ul>
+  </li>
+  <li> <a href="#xjsl-methods">Методы xjsl</a>
+  	<ul>
+  	 <li><a href="#xjsl-methods-DOM">Методы для работы с DOM</a></li>
+  	 <li><a href="#xjsl-ready">$.ready(...)</a></li>
+  	 <li><a href="#xjsl-methods-ajax">Методы работы c <abbr title="Asynchronous JavaScript and XML">AJAX</abbr></a></li>
+  	 <li><a href="#xjsl-methods-cookie">Методы работы c <abbr title="Cookies technology">Cookie</abbr></a></li>
+  	 <li><a href="#xjsl-methods-storage">Методы работы c <abbr title="Web (DOM) Storage">Storage</abbr></a></li>
+  	</ul>
+  </li>
+  <li><a href="#xjsl-extensions">Плагины и расширения xjsl</a>
+   <ul>
+    <li><a href="#xjsl-extensions-canvas">xjsl.canvas</a></li>
+   </ul>
+  </li>
+  <li><a href="#xjsl-writing-extensions">Создание расширений для xjsl</a></li>
+  <li><a href="#xjsl-features">Что дальше?</a></li>
+ </ul>
+ <script>hljs.initHighlightingOnLoad()</script>
+</body></html>

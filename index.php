@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <link rel="stylesheet" type="text/css" href="style.css" />
   <link rel="icon" type="image/png" href="favicon.png" />
-  <script src="xjsl/xjsl.js"></script>
+  <script src="xjsl.js"></script>
   <script src="script.js"></script>
   <title>Механический факультет УГНТУ</title>
 </head>
@@ -34,7 +34,7 @@
   </aside>
   <div id="container">
     <div id="feature">
-	  <img />
+	  <img src="img/feature1.jpg"/>
       <div id="featureBottomButtons"></div>
 	  <div id="featureCenterButtons">
 	    <button class="featureButtonLeft">&nbsp;</button>
@@ -64,7 +64,7 @@
 				- 16:00, конференц-зал корпуса №1, дипломы без отличия (синие дипломы).
 				<img src="img/news/1.jpg" height="200px"/></p>	
 		  </p></a>
-		  <a href="#" class="news" onClick="showNews(1);"><p class="newsPosted">Posted <span>10.10.2010</span></p><h3>Сайт в разработке</h3><p class="newsShortText">В настоящий момент сайт находится в разработке. Все ссылки кликабельны. Также работает нажатие на новость.</p></a>
+		  <a href="#" class="news" onClick="showNews(1);"><p class="newsPosted">Posted <span>10.10.2010</span></p><h3>Сайт в разработке</h3><p class="newsShortText">В настоящий момент сайт находится в разработке. Все ссылки кликабельны.</p></a>
 		 </article>
 	   
 	  </section>

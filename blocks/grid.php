@@ -17,6 +17,6 @@ if ($now >= $spt_now) //если сейчас номер недели больш
 <div id="grid">
  <a href="http://www.rusoil.net" target="_blank" class="ugntu">УГНТУ</a> 
  <a href="http://profstud.rusoil.net/" target="_blank" class="profkom">Профком</a>
- <a href="#" class="week">Неделя<div><?php echo $weeks;?></div></a>
+ <a href="calendar.php" class="week">Неделя<div><?php echo $weeks;?></div></a>
  <a href="http://vk.com/mf_ugntu" target="_blank" class="vk">vkontakte</a>
 </div> 

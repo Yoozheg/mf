@@ -27,16 +27,11 @@ function showNews(id){
  }
 }
 
-var feature = {
- list: ['img/feature1.jpg','img/feature2.jpg','img/feature3.jpg','img/feature4.jpg'],
- current: 0,
- set: function(index){
-  $('#feature>img').src = feature.list[feature.current = index];
-  clearTimeout(feature.timer);
-  feature.timer = setTimeout(function(){$('.featureButtonRight').click()},7000);
- },
- timer: 0
-};
+
+var feature = ['img/feature1.jpg','img/feature2.jpg','img/feature3.jpg','img/feature4.jpg'];
+var featureCurrent = 0;
+
+
 
 function fixItem(el){
  alert($(['.'+el.className]));
@@ -45,23 +40,13 @@ function fixItem(el){
 
 
 $.ready(function(){
- for(var i=0; i < feature.list.length; ++i){
-  $('#featureBottomButtons').append(new $('button')).html('&nbsp;').val(''+i).event.add({click: function(){
-   feature.set(this.value);  //формируем нижние кнопки из списка
-  }})
- }
- 
- $('.featureButtonLeft').event.add({click: function(){ // обработка клика на левую кнопку
-  feature.set(feature.current == 0 ? feature.list.length-1 : feature.current-1);
- }})
- 
- $('.featureButtonRight').event.add({click: function(){ // обработка клика на правую кнопку
-  feature.set(feature.current == feature.list.length-1 ? 0 : feature.current+1);
- }})
- 
- feature.set(0);
 
- 
+ if($('#feature>img')){
+  setInterval(function(){
+   featureCurrent = featureCurrent == feature.length-1 ? 0 : featureCurrent+1;
+   $('#feature>img').attr('src',feature[featureCurrent]);
+  },10000)
+ }
  
 })
 

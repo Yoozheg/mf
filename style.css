@@ -30,13 +30,6 @@ header>nav >ul>li:hover>ul.dropDownMenu{display:block;z-index:12;}
 #container{margin-right:290px;}
 
 #feature{height:279px;position:relative; overflow:hidden;margin-bottom:10px;}
-#featureBottomButtons{display:none;position:absolute;bottom:0;left:0;right:0;text-align:center;background:rgba(75,75,75,.8);}
-#featureBottomButtons button{background:url('img/circle1.png') center center no-repeat;width:29px;height:29px;outline:none;border:none;margin:3px;}
-#featureBottomButtons button:hover{background:url('img/circle.png') center center no-repeat;}
-#featureCenterButtons{display:none;position:absolute;top:100px;left:0;right:0;height:79px;text-align:center;background:transparent;}
-#feature:hover #featureBottomButtons,#feature:hover #featureCenterButtons{display:none;}/*Чтобы на слайдшоу были кнопки поставить тут display:block;*/
-.featureButtonLeft{float:left;margin-left:10px;background:url('img/arrow_left.png') center center no-repeat;width:29px;height:29px;outline:none;border:none;}
-.featureButtonRight{float:right;margin-right:10px;background:url('img/arrow_right.png') center center no-repeat;width:29px;height:29px;outline:none;border:none;}
 
 #grid{display:block;height:279px;overflow:hidden;margin-bottom:10px;}
 #grid a{display:block;width:122px;height:135px;background-color:#36e;float:left;margin-bottom:4px;color:white;font-family:'Segoe UI',Verdana,Tahoma,serif;font-weight:normal;font-size:1.1em;padding:2px 0 0 15px;text-transform:capitalize;}
@@ -51,6 +44,9 @@ header>nav >ul>li:hover>ul.dropDownMenu{display:block;z-index:12;}
 #grid a.raspisanie:hover{background:#34e url('img/ugntu.png') bottom right no-repeat;color:white;}
 #grid a.vk{background:#36e url('img/vk.png') bottom right no-repeat;color:white;}
 #grid a.vk:hover{background:#34e url('img/vk.png') bottom right no-repeat;color:white;}
+#grid a.week{color:white; position:relative;}
+#grid a.week div{color:white;font:bold 80px/65px "Trebuchet MS";position:absolute;bottom:0;right:3px;}
+#grid a.week:hover{}
 
 #content section h2,aside section h2{background:#36e url('img/arrow_sidebar.png') bottom right no-repeat;font-size:1.1em;color:white;padding:5px 0 5px 10px;}
 #content section{clear:left;}
@@ -95,13 +91,15 @@ p.newsShortText{color:black;}
 
 #calendar{}
 #calendar td{width:25px;}
-#calendar td:nth-child(8),#calendar td.holiday{color:red;}
+#calendar td:nth-child(8),#calendar td.holyday{color:red;}
 #calendar td.now{background-color:#ddd;}
+#calendar td.now.holyday{background-color:#fcc;}
+#calendar td.week{background-color:#dfdfdf;}
 #calendar td.null{border-left:none;border-top:none;}
 #calendar thead td{vertical-align:middle;}
 #calendar thead td div{height:29px;width:29px;cursor:pointer;}
-#calendar thead td div.buttonLeft{float:left;background:url('img/arrow_left.png') center center no-repeat;}
-#calendar thead td div.buttonRight{float:right;background:url('img/arrow_right.png') center center no-repeat;}
+#buttonLeft{float:left;background:url('img/arrow_left.png') center center no-repeat;}
+#buttonRight{float:right;background:url('img/arrow_right.png') center center no-repeat;}
 
 #profili h3{font-weight:bold;font-size:1.1em;text-transform:uppercase;margin-top:10px;text-align:center;}
 #profili h4{font-weight:bold;font-size:1.1em;text-align:center;}
